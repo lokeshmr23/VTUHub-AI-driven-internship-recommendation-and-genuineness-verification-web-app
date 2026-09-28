@@ -1,0 +1,136 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Resume &amp; skills · {{ app_name }}{% endblock %}
+{% block page_title %}Resume &amp; skill profile{% endblock %}
+{% block page_sub %}Upload a PDF/DOCX resume — the NLP engine extracts skills, entities and your best-fit domain{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-cloud-arrow-up me-2 text-primary"></i>Upload resume</div>
+      <div class="card-body">
+        <form id="uploadForm">
+          <label class="upload-drop w-100" id="dropZone" for="resumeFile">
+            <input type="file" id="resumeFile" name="resume" accept=".pdf,.docx" class="d-none">
+            <div class="icon"><i class="bi bi-file-earmark-arrow-up"></i></div>
+            <div class="fw-semibold mt-2" id="dropTitle">Drop your resume here or click to browse</div>
+            <div class="text-muted-soft small">PDF or DOCX · max 8 MB</div>
+          </label>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted-soft text-tiny" id="fileHint">No file selected</span>
+            <button class="btn btn-gradient" type="submit" id="uploadBtn" disabled>
+              <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>
+              <i class="bi bi-magic me-1"></i>Parse &amp; extract</button>
+          </div>
+        </form>
+        <div id="uploadProgress" class="mt-3 d-none">
+          <div class="progress" style="height:6px"><div class="progress-bar progress-bar-striped
+            progress-bar-animated" style="width:100%"></div></div>
+          <div class="text-muted-soft text-tiny mt-2">Running NLTK pipeline: tokenise → section detection →
+            skill matching → vector build…</div>
+        </div>
+        <div class="divider-y"></div>
+        <div class="small text-muted-soft">
+          <i class="bi bi-lightbulb me-1"></i>Tip: sample resumes live in
+          <code>samples/resumes/</code> if you want a quick test upload.
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Profile details</div>
+      <div class="card-body">
+        <form id="profileForm" class="row g-3">
+          <div class="col-12"><label class="form-label" for="pName">Full name</label>
+            <input class="form-control form-control-sm" id="pName"></div>
+          <div class="col-6"><label class="form-label" for="pRoll">Roll number</label>
+            <input class="form-control form-control-sm" id="pRoll"></div>
+          <div class="col-6"><label class="form-label" for="pCollege">College</label>
+            <input class="form-control form-control-sm" id="pCollege"></div>
+          <div class="col-6"><label class="form-label" for="pBranch">Branch</label>
+            <input class="form-control form-control-sm" id="pBranch"></div>
+          <div class="col-6"><label class="form-label" for="pYear">Graduation year</label>
+            <input class="form-control form-control-sm" id="pYear" type="number"></div>
+          <div class="col-6"><label class="form-label" for="pCgpa">CGPA</label>
+            <input class="form-control form-control-sm" id="pCgpa" type="number" step="0.01"></div>
+          <div class="col-6"><label class="form-label" for="pMode">Preferred work mode</label>
+            <select class="form-select form-select-sm" id="pMode">
+              <option value="any">Any</option><option value="remote">Remote</option>
+              <option value="hybrid">Hybrid</option><option value="onsite">On-site</option>
+            </select></div>
+          <div class="col-12"><label class="form-label" for="pDomain">Preferred domain <span class="badge-soft ms-1">+0.10 match bonus</span></label>
+            <select class="form-select form-select-sm" id="pDomain"></select></div>
+          <div class="col-12"><label class="form-label" for="pLocation">Preferred location</label>
+            <input class="form-control form-control-sm" id="pLocation"></div>
+          <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary btn-sm" type="submit" id="saveProfileBtn">
+              <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>Save profile</button>
+            <button class="btn btn-light btn-sm" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><i class="bi bi-clock-history me-2 text-primary"></i>Upload history</div>
+      <div class="card-body p-0"><div class="table-responsive">
+        <table class="table table-hover mb-0"><thead><tr>
+          <th>File</th><th>Skills</th><th>ATS</th><th>When</th></tr></thead>
+          <tbody id="uploadHistory"></tbody></table>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="row g-3 mb-1">
+      <div class="col-6 col-xl-3"><div class="card stat-card h-100"><div class="card-body">
+        <div class="stat-label">Skills</div><div class="stat-value" id="sSkills">—</div></div></div></div>
+      <div class="col-6 col-xl-3"><div class="card stat-card h-100"><div class="card-body">
+        <div class="stat-label">Categories</div><div class="stat-value" id="sCategories">—</div></div></div></div>
+      <div class="col-6 col-xl-3"><div class="card stat-card accent-green h-100"><div class="card-body">
+        <div class="stat-label">ATS score</div><div class="stat-value" id="sAts">—</div></div></div></div>
+      <div class="col-6 col-xl-3"><div class="card stat-card accent-amber h-100"><div class="card-body">
+        <div class="stat-label">Profile complete</div><div class="stat-value" id="sComplete">—</div></div></div></div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-cloud-fill me-2 text-primary"></i>Skill tag cloud</span>
+        <span class="text-muted-soft text-tiny">bubble size = extraction weight</span>
+      </div>
+      <div class="card-body" id="cloudBox"></div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><i class="bi bi-bullseye me-2 text-primary"></i>Domain fit</div>
+      <div class="card-body" id="domainBox"></div>
+    </div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header"><i class="bi bi-pie-chart me-2 text-primary"></i>Skill categories</div>
+          <div class="card-body"><div class="chart-box" style="height:230px"><canvas id="catChart"></canvas></div></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header"><i class="bi bi-key me-2 text-primary"></i>Top keywords &amp; entities</div>
+          <div class="card-body">
+            <div class="tag-cloud mb-3" id="keywordCloud"></div>
+            <div id="entityList" class="small"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><i class="bi bi-clipboard2-pulse me-2 text-primary"></i>Resume insights</div>
+      <div class="card-body" id="insightsBox"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>Student.initProfile();</script>
+{% endblock %}

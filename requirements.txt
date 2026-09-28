@@ -1,0 +1,43 @@
+# InternMatch AI — Python dependencies
+# pip install -r requirements.txt
+
+# --- Web framework & persistence ---
+Flask==3.1.3
+Flask-SQLAlchemy==3.1.1
+Flask-Cors==6.0.1
+SQLAlchemy==2.0.44
+PyMySQL==1.2.3            # MySQL driver. This 1.2.x release implements TLS
+                          # "preferred" mode (encrypt when offered), which the
+                          # managed hosts require. NB: it reports
+                          # pymysql.__version__ == "2.2.8" — pin by the PyPI
+                          # version (1.2.3), not that string.
+python-dotenv==1.1.1
+
+# --- Auth ---
+PyJWT==2.10.1
+Werkzeug==3.1.3           # password hashing
+
+# --- NLP / ML ---
+scikit-learn==1.6.1
+nltk==3.10.0
+numpy==2.3.5
+joblib==1.5.3
+pandas==2.3.3             # optional (CSV analytics workbooks)
+
+# --- Resume parsing ---
+pypdf==6.4.0              # PDF text extraction (fast path)
+pdfminer.six==20250506    # PDF text extraction (fallback, layout tolerant)
+python-docx==1.2.0        # DOCX text extraction
+
+# --- Sample asset generation ---
+reportlab==4.4.4          # sample resume PDFs for upload testing
+
+# --- Optional live domain checks (ENABLE_LIVE_DOMAIN_CHECKS=1) ---
+python-whois==0.9.5       # registrar / creation-date lookups
+dnspython==2.8.0          # MX record validation
+
+# --- Production server (Render / Railway / gunicorn) ---
+gunicorn==26.2.0          # WSGI server used by Procfile + render.yaml
+
+# --- Tests ---
+requests==2.32.5

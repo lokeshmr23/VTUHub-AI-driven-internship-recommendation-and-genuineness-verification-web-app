@@ -1,0 +1,95 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Analytics · {{ app_name }}{% endblock %}
+{% block page_title %}Placement analytics{% endblock %}
+{% block page_sub %}Trust-score health, domain risk and student engagement{% endblock %}
+{% block topbar_actions %}
+  <button class="btn btn-soft btn-sm" id="retrainBtn"><i class="bi bi-cpu me-1"></i>Retrain ML model</button>
+  <button class="btn btn-gradient btn-sm" id="refreshAnalytics"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card stat-card h-100"><div class="card-body">
+    <div class="stat-label">Listings scored</div><div class="stat-value" data-kpi="total_listings">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-red h-100"><div class="card-body">
+    <div class="stat-label">Flag rate</div><div class="stat-value" data-kpi="flag_rate">—</div>
+    <div class="text-muted-soft text-tiny" data-kpi-sub="flagged_listings"></div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-green h-100"><div class="card-body">
+    <div class="stat-label">Avg. trust score</div><div class="stat-value" data-kpi="avg_trust_score">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-amber h-100"><div class="card-body">
+    <div class="stat-label">Avg. student ATS</div><div class="stat-value" data-kpi="avg_student_ats">—</div>
+    <div class="text-muted-soft text-tiny" data-kpi-sub="students"></div></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Trust score bands</div>
+      <div class="card-body"><div class="chart-box" style="height:290px"><canvas id="aBandChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-shield-check me-2 text-primary"></i>Badge distribution</div>
+      <div class="card-body"><div class="chart-box" style="height:290px"><canvas id="aBadgeChart"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-diagram-2 me-2 text-primary"></i>Listings &amp; avg. trust by domain</div>
+      <div class="card-body"><div class="chart-box" style="height:330px"><canvas id="aDomainChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-flag-fill me-2 text-danger"></i>Most frequent red flags</div>
+      <div class="card-body"><div class="chart-box" style="height:330px"><canvas id="aFlagChart"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-kanban me-2 text-primary"></i>Application status</div>
+      <div class="card-body"><div class="chart-box" style="height:260px"><canvas id="aAppChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-chat-square-text me-2 text-primary"></i>Student feedback verdicts</div>
+      <div class="card-body"><div class="chart-box" style="height:260px"><canvas id="aFeedbackChart"></canvas></div>
+        <div class="text-center text-muted-soft text-tiny" id="feedbackAvg"></div></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-buildings me-2 text-primary"></i>Most active recruiters</div>
+      <div class="card-body p-0"><div class="table-responsive">
+        <table class="table table-hover mb-0"><tbody id="topCompanies"></tbody></table>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-3">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-activity me-2 text-primary"></i>Posting trend vs flags</div>
+      <div class="card-body"><div class="chart-box" style="height:270px"><canvas id="aTrendChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-cpu me-2 text-primary"></i>Model &amp; thresholds</div>
+      <div class="card-body" id="modelBox"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initAnalytics();</script>
+{% endblock %}

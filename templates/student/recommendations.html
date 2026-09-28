@@ -1,0 +1,78 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Recommendations · {{ app_name }}{% endblock %}
+{% block page_title %}Recommended internships{% endblock %}
+{% block page_sub %}TF-IDF + cosine similarity ranking with a +0.10 domain-preference bonus{% endblock %}
+{% block topbar_actions %}
+  <button class="btn btn-soft btn-sm" data-bs-toggle="modal" data-bs-target="#algoModal">
+    <i class="bi bi-cpu me-1"></i>How ranking works</button>
+{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label" for="fDomain">Domain</label>
+        <select class="form-select form-select-sm" id="fDomain"><option value="">All domains</option></select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="fMode">Work mode</label>
+        <select class="form-select form-select-sm" id="fMode">
+          <option value="">Any</option><option value="remote">Remote</option>
+          <option value="hybrid">Hybrid</option><option value="onsite">On-site</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="fTrust">Min trust: <span id="trustLabel" class="fw-800">0</span></label>
+        <input type="range" class="form-range" id="fTrust" min="0" max="90" step="5" value="0">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="fSort">Sort</label>
+        <select class="form-select form-select-sm" id="fSort">
+          <option value="match">Best match</option>
+          <option value="trust">Highest trust</option>
+          <option value="stipend">Highest stipend</option>
+          <option value="recent">Most recent</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="fQuery">Search title / company</label>
+        <div class="input-group input-group-sm">
+          <input class="form-control" id="fQuery" placeholder="e.g. machine learning">
+          <button class="btn btn-soft" id="applyFilters"><i class="bi bi-search"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex flex-wrap gap-3 align-items-center mt-3 pt-3 divider-y" style="border-top:1px solid var(--im-border);margin-top:1rem!important">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="fFlagged" checked>
+        <label class="form-check-label small" for="fFlagged">Include flagged (red) listings</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="fBonus">
+        <label class="form-check-label small" for="fBonus">Only my preferred domain</label>
+      </div>
+      <span class="text-muted-soft text-tiny ms-auto" id="resultMeta"></span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3" id="recGrid"></div>
+<div id="recPagination" class="mt-3"></div>
+
+<div class="modal fade" id="algoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title"><i class="bi bi-cpu me-2"></i>How recommendations are computed</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="formula-box mb-3" id="algoFormula"></div>
+        <ul class="small mb-0" id="algoNotes"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>Student.initRecommendations();</script>
+{% endblock %}

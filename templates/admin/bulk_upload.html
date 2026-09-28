@@ -1,0 +1,77 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Bulk CSV upload · {{ app_name }}{% endblock %}
+{% block page_title %}Bulk CSV upload{% endblock %}
+{% block page_sub %}Import many listings at once — each one is auto-scored by the trust engine{% endblock %}
+{% block topbar_actions %}
+  <a class="btn btn-soft btn-sm" href="/api/admin/bulk-upload/template">
+    <i class="bi bi-download me-1"></i>Download template</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-filetype-csv me-2 text-primary"></i>Upload CSV</div>
+      <div class="card-body">
+        <form id="csvForm">
+          <label class="upload-drop w-100" id="csvDrop" for="csvFile">
+            <input type="file" id="csvFile" accept=".csv" class="d-none">
+            <div class="icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+            <div class="fw-semibold mt-2" id="csvTitle">Choose a .csv file or drop it here</div>
+            <div class="text-muted-soft small" id="csvHint">Header row must match the template</div>
+          </label>
+          <button class="btn btn-gradient w-100 mt-3" type="submit" id="csvBtn" disabled>
+            <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>
+            <i class="bi bi-cloud-upload me-1"></i>Import &amp; score listings</button>
+        </form>
+        <div class="divider-y"></div>
+        <div class="small text-muted-soft">
+          A ready-made sample (6 rows, including two deliberate scam listings) is at
+          <code>samples/internships_bulk_upload.csv</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><i class="bi bi-info-circle me-2 text-primary"></i>Expected columns</div>
+      <div class="card-body">
+        <div class="tag-cloud" id="colList"></div>
+        <div class="divider-y"></div>
+        <ul class="small text-muted-soft mb-0">
+          <li><strong>Required:</strong> title, company, contact_email, description</li>
+          <li><code>skills_required</code> accepts comma-separated values</li>
+          <li>Dates accept <code>YYYY-MM-DD</code></li>
+          <li>Duplicates (same title + company) are skipped automatically</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-clipboard-check me-2 text-primary"></i>Import summary</div>
+      <div class="card-body" id="importSummary">
+        <div class="empty-state py-4">
+          <div class="icon"><i class="bi bi-inboxes"></i></div>
+          <h5>No import yet</h5>
+          <p>Upload a CSV to see created / skipped / flagged counts and per-row trust scores here.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><i class="bi bi-list-check me-2 text-primary"></i>Row results</div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr><th>#</th><th>Title</th><th>Company</th><th>Trust</th><th>Status</th></tr></thead>
+          <tbody id="importResults">
+            <tr><td colspan="5" class="text-center text-muted-soft py-4">Nothing imported yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initBulkUpload();</script>
+{% endblock %}

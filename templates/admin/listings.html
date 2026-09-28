@@ -1,0 +1,163 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Manage listings · {{ app_name }}{% endblock %}
+{% block page_title %}Manage internship listings{% endblock %}
+{% block page_sub %}Create, edit, re-score and delete listings — every change is audited{% endblock %}
+{% block topbar_actions %}
+  <button class="btn btn-soft btn-sm" id="recomputeSingleHint"><i class="bi bi-arrow-repeat me-1"></i>Scores auto-recompute on save</button>
+  <button class="btn btn-gradient btn-sm" data-bs-toggle="modal" data-bs-target="#listingModal" id="newListingBtn">
+    <i class="bi bi-plus-lg me-1"></i>New listing</button>
+{% endblock %}
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input class="form-control form-control-sm" id="lSearch" placeholder="Title, company or email">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Badge</label>
+        <select class="form-select form-select-sm" id="lBadge">
+          <option value="">All</option><option>Green</option><option>Amber</option><option>Red</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Flagged</label>
+        <select class="form-select form-select-sm" id="lFlagged">
+          <option value="">All</option><option value="true">Flagged only</option>
+          <option value="false">Not flagged</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Sort</label>
+        <select class="form-select form-select-sm" id="lSort">
+          <option value="recent">Most recent</option><option value="trust_asc">Lowest trust</option>
+          <option value="trust">Highest trust</option><option value="company">Company A–Z</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-soft btn-sm flex-fill" id="lApply"><i class="bi bi-funnel me-1"></i>Filter</button>
+        <button class="btn btn-light btn-sm" id="lClear"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-briefcase-fill me-2 text-primary"></i>Listings</span>
+    <span class="text-muted-soft text-tiny" id="listingsMeta"></span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr>
+        <th>Role</th><th class="d-none d-md-table-cell">Company / domain</th>
+        <th class="d-none d-lg-table-cell">Domain · mode</th><th>Trust</th>
+        <th class="d-none d-xl-table-cell">Flags</th><th class="text-end">Actions</th>
+      </tr></thead>
+      <tbody id="listingsBody"></tbody>
+    </table>
+  </div>
+  <div class="card-body" id="listingsPagination"></div>
+</div>
+
+<!-- create / edit modal -->
+<div class="modal fade" id="listingModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="listingModalTitle">New internship listing</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="listingForm" class="row g-3">
+          <input type="hidden" id="fId">
+          <div class="col-md-8"><label class="form-label" for="fTitle">Title *</label>
+            <input class="form-control form-control-sm" id="fTitle" required></div>
+          <div class="col-md-4"><label class="form-label" for="fSource">Source</label>
+            <select class="form-select form-select-sm" id="fSource">
+              <option value="admin">admin</option><option value="partner">partner</option>
+              <option value="csv">csv</option><option value="scraped">scraped</option>
+            </select></div>
+          <div class="col-md-6"><label class="form-label" for="fCompany">Company *</label>
+            <input class="form-control form-control-sm" id="fCompany" required></div>
+          <div class="col-md-6"><label class="form-label" for="fEmail">Recruiter email *
+              <span class="text-muted-soft">(drives domain trust)</span></label>
+            <input class="form-control form-control-sm" id="fEmail" type="email" required
+                   placeholder="careers@company.com"></div>
+          <div class="col-md-4"><label class="form-label" for="fLocation">Location</label>
+            <input class="form-control form-control-sm" id="fLocation" list="locList" placeholder="Bengaluru, KA">
+            <datalist id="locList">
+              <option>Bengaluru, KA</option><option>Hyderabad, TS</option><option>Pune, MH</option>
+              <option>Chennai, TN</option><option>Mumbai, MH</option><option>Delhi NCR</option>
+              <option>Remote (India)</option>
+            </datalist></div>
+          <div class="col-md-4"><label class="form-label" for="fMode">Work mode</label>
+            <select class="form-select form-select-sm" id="fMode">
+              <option value="onsite">On-site</option><option value="hybrid">Hybrid</option>
+              <option value="remote">Remote</option></select></div>
+          <div class="col-md-4"><label class="form-label" for="fDomainField">Domain</label>
+            <select class="form-select form-select-sm" id="fDomainField"></select></div>
+          <div class="col-md-3"><label class="form-label" for="fStipend">Stipend (₹/month)</label>
+            <input class="form-control form-control-sm" id="fStipend" type="number" min="0" step="500" value="15000"></div>
+          <div class="col-md-3"><label class="form-label" for="fDuration">Duration (months)</label>
+            <input class="form-control form-control-sm" id="fDuration" type="number" min="1" max="24" value="3"></div>
+          <div class="col-md-3"><label class="form-label" for="fOpenings">Openings</label>
+            <input class="form-control form-control-sm" id="fOpenings" type="number" min="1" value="1"></div>
+          <div class="col-md-3"><label class="form-label" for="fDeadline">Deadline</label>
+            <input class="form-control form-control-sm" id="fDeadline" type="date"></div>
+          <div class="col-12"><label class="form-label" for="fSkills">Skills required
+              <span class="text-muted-soft">(comma separated)</span></label>
+            <input class="form-control form-control-sm" id="fSkills" placeholder="python, flask, mysql"></div>
+          <div class="col-12"><label class="form-label" for="fUrl">Apply URL *</label>
+            <input class="form-control form-control-sm" id="fUrl" required placeholder="https://company.com/careers/role"></div>
+          <div class="col-12"><label class="form-label" for="fDescription">Job description *</label>
+            <textarea class="form-control form-control-sm" id="fDescription" rows="6" required
+                      placeholder="Responsibilities, requirements, selection process…"></textarea>
+            <div class="form-text">Descriptions under 25 words are penalised in the completeness score.</div></div>
+          <div class="col-12"><div id="listingFormError" class="alert alert-danger py-2 small d-none"></div></div>
+          <div class="col-12" id="trustPreview"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-gradient btn-sm" id="saveListingBtn">
+          <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>Save &amp; score</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- trust override modal -->
+<div class="modal fade" id="overrideModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title"><i class="bi bi-shield-lock me-2"></i>Override trust score</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="oId">
+        <div class="mb-2 small text-muted-soft" id="oContext"></div>
+        <label class="form-label" for="oScore">New trust score (0–100)</label>
+        <input class="form-control mb-3" id="oScore" type="number" min="0" max="100">
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="oFlag">
+          <label class="form-check-label small" for="oFlag">Keep / set fraud flag</label>
+        </div>
+        <label class="form-label" for="oNote">Justification (required, audited)</label>
+        <textarea class="form-control form-control-sm" id="oNote" rows="3"
+                  placeholder="e.g. Verified directly with the company HR on call; domain whitelisted."></textarea>
+        <div id="overrideError" class="alert alert-danger py-2 small mt-3 d-none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="saveOverrideBtn">
+          <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>Apply override</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initListings();</script>
+{% endblock %}

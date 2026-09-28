@@ -1,0 +1,94 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Admin dashboard · {{ app_name }}{% endblock %}
+{% block page_title %}Placement cell dashboard{% endblock %}
+{% block page_sub %}Listings, verification health and student activity{% endblock %}
+{% block topbar_actions %}
+  <a class="btn btn-soft btn-sm" href="/admin/bulk-upload"><i class="bi bi-filetype-csv me-1"></i>Bulk upload</a>
+  <a class="btn btn-gradient btn-sm" href="/admin/listings"><i class="bi bi-plus-lg me-1"></i>New listing</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="card stat-card h-100"><div class="card-body">
+    <div class="d-flex justify-content-between"><div>
+      <div class="stat-label">Listings</div><div class="stat-value" data-kpi="total_listings">—</div>
+      <div class="text-muted-soft text-tiny" data-kpi-sub="posted">—</div></div>
+      <div class="stat-icon"><i class="bi bi-briefcase"></i></div></div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat-card accent-red h-100"><div class="card-body">
+    <div class="d-flex justify-content-between"><div>
+      <div class="stat-label">Flagged</div><div class="stat-value" data-kpi="flagged_listings">—</div>
+      <div class="text-muted-soft text-tiny"><span data-kpi="flag_rate">—</span>% of inventory</div></div>
+      <div class="stat-icon"><i class="bi bi-flag"></i></div></div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat-card accent-green h-100"><div class="card-body">
+    <div class="d-flex justify-content-between"><div>
+      <div class="stat-label">Avg. trust</div><div class="stat-value" data-kpi="avg_trust_score">—</div>
+      <div class="text-muted-soft text-tiny">across all listings</div></div>
+      <div class="stat-icon"><i class="bi bi-shield-check"></i></div></div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="card stat-card accent-amber h-100"><div class="card-body">
+    <div class="d-flex justify-content-between"><div>
+      <div class="stat-label">Applications</div><div class="stat-value" data-kpi="applications">—</div>
+      <div class="text-muted-soft text-tiny"><span data-kpi="students">—</span> students · <span data-kpi="feedback">—</span> feedback</div></div>
+      <div class="stat-icon"><i class="bi bi-people"></i></div></div></div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-activity me-2 text-primary"></i>Trust score distribution</span>
+        <span class="badge-ghost">Green ≥75 · Amber 50–74 · Red &lt;50</span>
+      </div>
+      <div class="card-body"><div class="chart-box" style="height:280px"><canvas id="bandChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-shield-exclamation me-2 text-primary"></i>Badge split</div>
+      <div class="card-body"><div class="chart-box" style="height:280px"><canvas id="badgeChart"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-flag-fill me-2 text-danger"></i>Top fraud signals in the queue</span>
+        <a class="btn btn-soft btn-sm" href="/admin/flagged">Review queue</a>
+      </div>
+      <div class="card-body" id="topFlagsBox"></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-cpu me-2 text-primary"></i>ML fraud classifier</div>
+      <div class="card-body" id="mlBox"></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-3">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-graph-up me-2 text-primary"></i>Posting trend vs flagged (8 weeks)</div>
+      <div class="card-body"><div class="chart-box" style="height:260px"><canvas id="trendChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Needs attention now</span>
+        <button class="btn btn-soft btn-sm" id="recomputeAllBtn"><i class="bi bi-arrow-repeat me-1"></i>Re-score all</button>
+      </div>
+      <div class="card-body p-0"><div class="table-responsive">
+        <table class="table table-hover mb-0"><thead><tr>
+          <th>Lowest trust listings</th><th>Score</th></tr></thead>
+        <tbody id="worstBody"></tbody></table>
+      </div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initDashboard();</script>
+{% endblock %}

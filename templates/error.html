@@ -1,0 +1,15 @@
+{% extends 'partials/base_public.html' %}
+{% block title %}{{ code }} · {{ app_name }}{% endblock %}
+{% block body %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:100vh">
+  <div class="text-center">
+    <div class="display-1 fw-800" style="background:var(--im-gradient);-webkit-background-clip:text;background-clip:text;color:transparent">{{ code }}</div>
+    <h4 class="fw-bold mt-2">{{ message }}</h4>
+    <p class="text-muted-soft">The page you're looking for isn't here. Try the dashboard.</p>
+    <div class="d-flex gap-2 justify-content-center">
+      <a class="btn btn-gradient" href="/student/dashboard"><i class="bi bi-grid-1x2 me-1"></i>Go to dashboard</a>
+      <a class="btn btn-light" href="/">Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}My applications · {{ app_name }}{% endblock %}
+{% block page_title %}My applications{% endblock %}
+{% block page_sub %}Track status, match score and trust badge for every application{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card stat-card h-100"><div class="card-body">
+    <div class="stat-label">Total</div><div class="stat-value" id="aTotal">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-amber h-100"><div class="card-body">
+    <div class="stat-label">In progress</div><div class="stat-value" id="aProgress">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-green h-100"><div class="card-body">
+    <div class="stat-label">Selected</div><div class="stat-value" id="aSelected">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-red h-100"><div class="card-body">
+    <div class="stat-label">On flagged listings</div><div class="stat-value" id="aFlagged">—</div></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-pie-chart me-2 text-primary"></i>Status breakdown</div>
+      <div class="card-body"><div class="chart-box" style="height:260px"><canvas id="appStatusChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+        <span><i class="bi bi-kanban me-2 text-primary"></i>Application history</span>
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" id="statusFilter" style="width:auto">
+            <option value="">All statuses</option>
+            <option value="applied">Applied</option><option value="under_review">Under review</option>
+            <option value="shortlisted">Shortlisted</option><option value="interview">Interview</option>
+            <option value="selected">Selected</option><option value="rejected">Rejected</option>
+          </select>
+          <button class="btn btn-soft btn-sm" id="refreshApps"><i class="bi bi-arrow-clockwise"></i></button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr>
+            <th>Role / company</th><th class="d-none d-md-table-cell">Match</th>
+            <th>Trust</th><th>Status</th><th>Applied</th><th class="text-end">Actions</th>
+          </tr></thead>
+          <tbody id="appsBody"></tbody>
+        </table>
+      </div>
+      <div class="card-body" id="appsPagination"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>Student.initApplications();</script>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'partials/base_public.html' %}
+{% block title %}Log in · {{ app_name }}{% endblock %}
+{% block body %}
+<div class="auth-wrap">
+  <aside class="auth-aside">
+    <a class="d-flex align-items-center gap-2 text-white fw-bold fs-5 mb-4" href="/">
+      <span style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center">
+        <i class="bi bi-mortarboard-fill"></i></span> InternMatch AI
+    </a>
+    <h2 class="fw-800 mb-3" style="max-width:420px">Apply smarter. Never get scammed.</h2>
+    <p style="max-width:420px;opacity:.9">Every listing carries a 0–100 Trust Score computed from recruiter
+      domain intelligence, red-flag phrase analysis and an ML fraud classifier — so you know what you're
+      walking into before you share a single document.</p>
+    <ul class="list-unstyled mt-3 small" style="opacity:.95">
+      <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i>Skill extraction from PDF/DOCX resumes</li>
+      <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i>Ranked recommendations with match %</li>
+      <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i>Fraud detail on every flagged listing</li>
+      <li><i class="bi bi-check-circle-fill me-2"></i>Feedback loop that protects other students</li>
+    </ul>
+  </aside>
+  <section class="auth-panel">
+    <div class="auth-card">
+      <h3 class="fw-bold mb-1">Welcome back</h3>
+      <p class="text-muted-soft mb-4">Log in to your student or admin account.</p>
+
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-soft btn-sm flex-fill" type="button" data-fill-student>
+          <i class="bi bi-person me-1"></i>Fill student demo</button>
+        <button class="btn btn-soft btn-sm flex-fill" type="button" data-fill-admin>
+          <i class="bi bi-shield-lock me-1"></i>Fill admin demo</button>
+      </div>
+
+      <form id="loginForm" class="card p-3 p-sm-4" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="email">Email address</label>
+          <input class="form-control" id="email" name="email" type="email" required
+                 placeholder="you@college.edu" autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-group">
+            <input class="form-control" id="password" name="password" type="password" required
+                   placeholder="••••••••" autocomplete="current-password">
+            <button class="btn btn-outline-secondary" type="button" data-toggle-pw><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <div id="loginError" class="alert alert-danger py-2 small d-none"></div>
+        <button class="btn btn-gradient w-100 py-2" type="submit" id="loginBtn">
+          <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>Log in
+        </button>
+      </form>
+
+      <div class="text-center mt-3 small">
+        New here? <a href="/register" class="fw-semibold">Create an account</a>
+      </div>
+      <div class="demo-cred mt-4">
+        <div><i class="bi bi-info-circle me-1"></i>Demo student</div>
+        <code>{{ demo_student.email }}</code>
+      </div>
+      <div class="demo-cred mt-2">
+        <div><i class="bi bi-info-circle me-1"></i>Demo admin</div>
+        <code>{{ demo_admin.email }}</code>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const form = document.getElementById('loginForm');
+  const errBox = document.getElementById('loginError');
+  document.querySelector('[data-fill-student]').onclick = () => {
+    document.getElementById('email').value = '{{ demo_student.email }}';
+    document.getElementById('password').value = '{{ demo_student.password }}';
+  };
+  document.querySelector('[data-fill-admin]').onclick = () => {
+    document.getElementById('email').value = '{{ demo_admin.email }}';
+    document.getElementById('password').value = '{{ demo_admin.password }}';
+  };
+  document.querySelector('[data-toggle-pw]').onclick = (e) => {
+    const pw = document.getElementById('password');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+    e.currentTarget.innerHTML = `<i class="bi bi-eye${pw.type === 'password' ? '' : '-slash'}"></i>`;
+  };
+
+  if (IM.getToken()) {
+    const u = IM.getUser();
+    if (u) location.href = u.role === 'admin' ? '/admin/dashboard' : '/student/dashboard';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBox.classList.add('d-none');
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.querySelector('[data-spin]').classList.remove('d-none');
+    try {
+      const data = await api('/api/auth/login', { method: 'POST', auth: false,
+        body: { email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value } });
+      IM.setSession(data);
+      toast(data.message, 'success', 1600);
+      const next = new URLSearchParams(location.search).get('next');
+      const target = next || (data.user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard');
+      setTimeout(() => location.href = target, 400);
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.classList.remove('d-none');
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.querySelector('[data-spin]').classList.add('d-none');
+    }
+  });
+</script>
+{% endblock %}

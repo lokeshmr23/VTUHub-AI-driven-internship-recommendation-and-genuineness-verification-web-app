@@ -1,0 +1,40 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Student feedback · {{ app_name }}{% endblock %}
+{% block page_title %}Student feedback{% endblock %}
+{% block page_sub %}Verified / Suspicious verdicts reported by students after applying{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card stat-card h-100"><div class="card-body">
+    <div class="stat-label">Total reports</div><div class="stat-value" id="fbTotal">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-green h-100"><div class="card-body">
+    <div class="stat-label">Verified</div><div class="stat-value" id="fbVerified">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-red h-100"><div class="card-body">
+    <div class="stat-label">Suspicious</div><div class="stat-value" id="fbSuspicious">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-amber h-100"><div class="card-body">
+    <div class="stat-label">Avg. rating</div><div class="stat-value" id="fbAvg">—</div></div></div></div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <span><i class="bi bi-chat-left-text-fill me-2 text-primary"></i>Feedback stream</span>
+    <select class="form-select form-select-sm" id="fbFilter" style="width:auto">
+      <option value="">All verdicts</option><option value="Verified">Verified</option>
+      <option value="Suspicious">Suspicious</option>
+    </select>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr>
+        <th>Listing</th><th>Student</th><th>Verdict</th><th>Rating</th>
+        <th class="d-none d-lg-table-cell">Comment</th><th class="d-none d-md-table-cell">When</th>
+      </tr></thead>
+      <tbody id="feedbackBody"></tbody>
+    </table>
+  </div>
+  <div class="card-body" id="feedbackPagination"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initFeedback();</script>
+{% endblock %}

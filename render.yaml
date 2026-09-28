@@ -1,0 +1,64 @@
+# =====================================================================
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+#   1. Push this repo to GitHub / GitLab.
+#   2. Render Dashboard → New → Blueprint → pick the repo.
+#   3. Render asks for the `sync: false` values below (your MySQL details).
+#
+# Render has no managed MySQL, so MYSQL_* must point at an external server
+# (Aiven free MySQL, TiDB Cloud Serverless, …). See DEPLOY.md for a walkthrough.
+#
+# No manual seeding step is needed: on the first boot against an empty database
+# the app creates its tables and seeds 500 listings + 50 students automatically
+# (~30-60 s, once). That matters because free Render services have no shell and
+# no one-off jobs.
+# =====================================================================
+services:
+  - type: web
+    name: internmatch-ai
+    runtime: python
+    plan: free
+    region: singapore            # closest to India; oregon / ohio / virginia / frankfurt also available
+    branch: main
+    buildCommand: bash build.sh
+    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT app:app
+    healthCheckPath: /healthz
+    envVars:
+      # --- Python runtime -------------------------------------------------
+      # Any 3.13.x works (the pinned wheels are built for 3.13).
+      - key: PYTHON_VERSION
+        value: "3.13.0"
+
+      # --- App ------------------------------------------------------------
+      - key: FLASK_CONFIG
+        value: prod
+      - key: SECRET_KEY
+        generateValue: true      # Render generates a strong random value
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_HOURS
+        value: "12"
+      - key: ADMIN_INVITE_CODE
+        value: INTERNMATCH-ADMIN
+
+      # --- NLTK corpora (downloaded here by build.sh) -----------------------
+      - key: NLTK_DATA
+        value: /opt/render/project/src/nltk_data
+
+      # --- MySQL (required: Render does not host MySQL) ---------------------
+      # Fill these in the Render dashboard when the Blueprint prompts you.
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_PORT
+        sync: false
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DATABASE
+        sync: false
+      # Optional TLS tuning (defaults already encrypt when the server supports it):
+      # - key: MYSQL_SSL_MODE      # preferred | verify-ca | verify-identity | disabled
+      #   value: verify-ca
+      # - key: MYSQL_SSL_CA        # path to the provider's ca.pem
+      #   sync: false

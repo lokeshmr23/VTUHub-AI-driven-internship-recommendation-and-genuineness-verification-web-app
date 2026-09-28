@@ -1,0 +1,171 @@
+{% extends 'partials/base_public.html' %}
+{% block title %}Create account · {{ app_name }}{% endblock %}
+{% block body %}
+<div class="auth-wrap">
+  <aside class="auth-aside">
+    <a class="d-flex align-items-center gap-2 text-white fw-bold fs-5 mb-4" href="/">
+      <span style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center">
+        <i class="bi bi-mortarboard-fill"></i></span> InternMatch AI
+    </a>
+    <h2 class="fw-800 mb-3" style="max-width:430px">Your resume becomes your search engine.</h2>
+    <p style="max-width:430px;opacity:.9">Registration takes 30 seconds. Then upload a resume and the NLP
+      engine builds your skill vector, infers your best-fit domain and ranks 500+ listings by genuine
+      fit — not by who paid for placement ads.</p>
+    <div class="row g-3 mt-4" style="max-width:430px">
+      <div class="col-6"><div class="p-3 rounded-3" style="background:rgba(255,255,255,.12)">
+        <div class="fw-800 fs-4">180+</div><div class="small" style="opacity:.85">skills recognised</div></div></div>
+      <div class="col-6"><div class="p-3 rounded-3" style="background:rgba(255,255,255,.12)">
+        <div class="fw-800 fs-4">12</div><div class="small" style="opacity:.85">fraud rule signals</div></div></div>
+    </div>
+  </aside>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <h3 class="fw-bold mb-1">Create your account</h3>
+      <p class="text-muted-soft mb-3">Students self-register. Admins need the placement-cell invite code.</p>
+
+      <ul class="nav nav-pills gap-2 mb-3" id="roleTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-role-tab="student" type="button">
+          <i class="bi bi-person-badge me-1"></i>Student</button></li>
+        <li class="nav-item"><button class="nav-link" data-role-tab="admin" type="button">
+          <i class="bi bi-shield-lock me-1"></i>Admin</button></li>
+      </ul>
+
+      <form id="registerForm" class="card p-3 p-sm-4" novalidate>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label" for="name">Full name</label>
+            <input class="form-control" id="name" required placeholder="Aarav Sharma">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" id="email" type="email" required placeholder="you@college.edu">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="phone">Phone (optional)</label>
+            <input class="form-control" id="phone" placeholder="9876543210">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" id="password" type="password" required placeholder="min 6 characters">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="confirm">Confirm password</label>
+            <input class="form-control" id="confirm" type="password" required placeholder="repeat password">
+          </div>
+
+          <div data-student-only class="col-md-6">
+            <label class="form-label" for="college">College</label>
+            <input class="form-control" id="college" placeholder="NIT Surathkal">
+          </div>
+          <div data-student-only class="col-md-6">
+            <label class="form-label" for="roll">Roll number</label>
+            <input class="form-control" id="roll" placeholder="CS2021042">
+          </div>
+          <div data-student-only class="col-md-6">
+            <label class="form-label" for="branch">Branch</label>
+            <select class="form-select" id="branch">
+              <option value="">Select branch…</option>
+              <option>Computer Science</option><option>Information Science</option>
+              <option>Information Technology</option><option>Electronics &amp; Communication</option>
+              <option>Electrical &amp; Electronics</option><option>Mechanical Engineering</option>
+              <option>Civil Engineering</option><option>AI &amp; ML</option>
+              <option>Chemical Engineering</option><option>Biotechnology</option>
+            </select>
+          </div>
+          <div data-student-only class="col-md-6">
+            <label class="form-label" for="gradyear">Graduation year</label>
+            <select class="form-select" id="gradyear">
+              <option value="">Select…</option><option>2026</option><option>2027</option>
+              <option>2028</option><option>2029</option>
+            </select>
+          </div>
+          <div data-student-only class="col-md-6">
+            <label class="form-label" for="cgpa">CGPA</label>
+            <input class="form-control" id="cgpa" type="number" step="0.01" min="0" max="10" placeholder="8.40">
+          </div>
+          <div data-student-only class="col-md-6">
+            <label class="form-label" for="domain">Preferred domain</label>
+            <select class="form-select" id="domain">
+              <option value="">Select…</option>
+              <option>Data Science &amp; ML</option><option>Web Development</option>
+              <option>Backend Engineering</option><option>Mobile App Development</option>
+              <option>Cloud &amp; DevOps</option><option>Cybersecurity</option>
+              <option>Embedded &amp; IoT</option><option>Mechanical Engineering</option>
+              <option>Civil Engineering</option><option>Electrical Engineering</option>
+              <option>QA &amp; Testing</option><option>UI/UX Design</option>
+              <option>Business &amp; Analytics</option><option>Blockchain &amp; Web3</option>
+            </select>
+            <div class="form-text">Preferred domain earns a +0.10 match bonus on your recommendations.</div>
+          </div>
+
+          <div data-admin-only class="col-12 d-none">
+            <label class="form-label" for="adminCode">Placement-cell invite code</label>
+            <input class="form-control" id="adminCode" placeholder="INTERNMATCH-ADMIN">
+            <div class="form-text">Demo invite code: <code>INTERNMATCH-ADMIN</code></div>
+          </div>
+        </div>
+
+        <div id="registerError" class="alert alert-danger py-2 small mt-3 d-none"></div>
+        <button class="btn btn-gradient w-100 py-2 mt-3" type="submit" id="registerBtn">
+          <span class="spinner-border spinner-border-sm d-none me-2" data-spin></span>Create account
+        </button>
+      </form>
+      <div class="text-center mt-3 small">Already registered? <a href="/login" class="fw-semibold">Log in</a></div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  let role = 'student';
+  const errBox = document.getElementById('registerError');
+
+  document.querySelectorAll('[data-role-tab]').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('[data-role-tab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      role = tab.getAttribute('data-role-tab');
+      document.querySelectorAll('[data-student-only]').forEach(el => el.classList.toggle('d-none', role !== 'student'));
+      document.querySelectorAll('[data-admin-only]').forEach(el => el.classList.toggle('d-none', role !== 'admin'));
+    };
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBox.classList.add('d-none');
+    const body = {
+      role, name: val('name'), email: val('email'), password: val('password'),
+      phone: val('phone') || null,
+    };
+    if (role === 'student') {
+      Object.assign(body, {
+        college: val('college') || null, roll_number: val('roll') || null,
+        branch: val('branch') || null, graduation_year: val('gradyear') || null,
+        cgpa: val('cgpa') || null, preferred_domain: val('domain') || null,
+      });
+    } else {
+      body.admin_code = val('adminCode');
+    }
+    if (body.password !== val('confirm')) {
+      errBox.textContent = 'Passwords do not match.'; errBox.classList.remove('d-none'); return;
+    }
+
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true; btn.querySelector('[data-spin]').classList.remove('d-none');
+    try {
+      const data = await api('/api/auth/register', { method: 'POST', auth: false, body });
+      IM.setSession(data);
+      toast(data.message + ' Upload your resume next.', 'success', 3200);
+      setTimeout(() => location.href = data.user.role === 'admin' ? '/admin/dashboard' : '/student/profile', 800);
+    } catch (err) {
+      errBox.textContent = err.message; errBox.classList.remove('d-none');
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled = false; btn.querySelector('[data-spin]').classList.add('d-none');
+    }
+  });
+
+  function val(id) { return (document.getElementById(id).value || '').trim(); }
+</script>
+{% endblock %}

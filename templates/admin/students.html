@@ -1,0 +1,62 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Students · {{ app_name }}{% endblock %}
+{% block page_title %}Student directory{% endblock %}
+{% block page_sub %}Skill vectors, ATS scores and application activity per student{% endblock %}
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-5"><label class="form-label">Search</label>
+        <input class="form-control form-control-sm" id="sSearch" placeholder="Name, email or college"></div>
+      <div class="col-md-3"><label class="form-label">Branch</label>
+        <select class="form-select form-select-sm" id="sBranch">
+          <option value="">All branches</option>
+          <option>Computer Science</option><option>Information Science</option>
+          <option>Information Technology</option><option>Electronics &amp; Communication</option>
+          <option>Electrical &amp; Electronics</option><option>Mechanical Engineering</option>
+          <option>Civil Engineering</option><option>AI &amp; ML</option>
+        </select></div>
+      <div class="col-md-4 d-flex gap-2">
+        <button class="btn btn-soft btn-sm flex-fill" id="sApply"><i class="bi bi-funnel me-1"></i>Filter</button>
+        <button class="btn btn-light btn-sm" id="sClear"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-people-fill me-2 text-primary"></i>Students</span>
+    <span class="text-muted-soft text-tiny" id="studentsMeta"></span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr>
+        <th>Student</th><th class="d-none d-md-table-cell">College / branch</th>
+        <th class="d-none d-lg-table-cell">Preferred domain</th>
+        <th>Top skills</th><th>ATS</th><th class="d-none d-md-table-cell">Apps</th>
+        <th class="text-end">Actions</th>
+      </tr></thead>
+      <tbody id="studentsBody"></tbody>
+    </table>
+  </div>
+  <div class="card-body" id="studentsPagination"></div>
+</div>
+
+<!-- student detail drawer -->
+<div class="modal fade" id="studentModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title"><i class="bi bi-person-badge me-2"></i>Student profile</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="studentModalBody">
+        <div class="spinner-wrap"><div class="spinner-border text-primary"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initStudents();</script>
+{% endblock %}

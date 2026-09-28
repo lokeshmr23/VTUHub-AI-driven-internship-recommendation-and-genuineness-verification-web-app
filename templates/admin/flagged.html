@@ -1,0 +1,44 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Fraud review queue · {{ app_name }}{% endblock %}
+{% block page_title %}Fraud review queue{% endblock %}
+{% block page_sub %}Listings flagged below the trust threshold or failing a hard domain check{% endblock %}
+{% block topbar_actions %}
+  <a class="btn btn-soft btn-sm" href="/api/admin/export/flagged.csv" id="exportFlagged">
+    <i class="bi bi-download me-1"></i>Export CSV</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-red h-100"><div class="card-body">
+    <div class="stat-label">In queue</div><div class="stat-value" id="qTotal">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-red h-100"><div class="card-body">
+    <div class="stat-label">Critical (&lt;30)</div><div class="stat-value" id="qCritical">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card accent-amber h-100"><div class="card-body">
+    <div class="stat-label">New this week</div><div class="stat-value" id="qNew">—</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card stat-card h-100"><div class="card-body">
+    <div class="stat-label">Avg. flagged score</div><div class="stat-value" id="qAvg">—</div></div></div></div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-5"><label class="form-label">Search</label>
+        <input class="form-control form-control-sm" id="qSearch" placeholder="Company or title"></div>
+      <div class="col-md-3"><label class="form-label">Severity</label>
+        <select class="form-select form-select-sm" id="qSeverity">
+          <option value="">All flagged</option><option value="critical">Critical (&lt;30)</option>
+          <option value="high">High (30–44)</option></select></div>
+      <div class="col-md-4 d-flex gap-2">
+        <button class="btn btn-soft btn-sm flex-fill" id="qApply"><i class="bi bi-funnel me-1"></i>Filter</button>
+        <button class="btn btn-light btn-sm" id="qClear"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="queueList"></div>
+<div class="card mt-3"><div class="card-body" id="queuePagination"></div></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initFlagged();</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Trust audit log · {{ app_name }}{% endblock %}
+{% block page_title %}Trust audit log{% endblock %}
+{% block page_sub %}Every score change, override and bulk import, with actor and justification{% endblock %}
+{% block topbar_actions %}
+  <button class="btn btn-soft btn-sm" id="recomputeAllBtn"><i class="bi bi-arrow-repeat me-1"></i>Re-score all listings</button>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2 text-primary"></i>Audit trail</span>
+        <select class="form-select form-select-sm" id="auditFilter" style="width:auto">
+          <option value="">All actions</option>
+          <option value="create">create</option><option value="recompute">recompute</option>
+          <option value="override">override</option><option value="csv_upload">csv_upload</option>
+        </select>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr>
+            <th>When</th><th>Listing</th><th>Action</th><th>Score change</th>
+            <th class="d-none d-lg-table-cell">Actor / note</th>
+          </tr></thead>
+          <tbody id="auditBody"></tbody>
+        </table>
+      </div>
+      <div class="card-body" id="auditPagination"></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-hdd-network me-2 text-primary"></i>Recruiter domain intelligence</div>
+      <div class="card-body p-0" style="max-height:620px;overflow:auto">
+        <table class="table table-hover mb-0"><tbody id="domainBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>Admin.initAudit();</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Listing detail · {{ app_name }}{% endblock %}
+{% block page_title %}<span id="detailTitle">Internship detail</span>{% endblock %}
+{% block page_sub %}Full listing with the complete fraud &amp; trust breakdown{% endblock %}
+{% block content %}
+<div id="detailRoot" data-internship-id="{{ internship_id }}">
+  <div class="row g-3">
+    <div class="col-lg-8" id="detailMain"></div>
+    <div class="col-lg-4" id="detailSide"></div>
+  </div>
+  <div class="mt-4" id="similarBox"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>Student.initDetail();</script>
+{% endblock %}

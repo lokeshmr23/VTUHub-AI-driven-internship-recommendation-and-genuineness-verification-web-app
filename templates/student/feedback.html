@@ -1,0 +1,36 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}My feedback · {{ app_name }}{% endblock %}
+{% block page_title %}Feedback &amp; community safety{% endblock %}
+{% block page_sub %}Your reports help other students spot scam listings early{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-hourglass-split me-2 text-primary"></i>Awaiting your feedback</div>
+      <div class="card-body" id="pendingFeedback"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><i class="bi bi-info-circle me-2 text-primary"></i>Why this matters</div>
+      <div class="card-body small text-muted-soft">
+        <p class="mb-2">Every Verified/Suspicious verdict is stored against the listing and shown to the
+          placement cell in the fraud review queue.</p>
+        <p class="mb-0">Listings that collect multiple Suspicious reports get escalated with a
+          lower trust score and appear at the top of the admin review queue.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-chat-square-heart me-2 text-primary"></i>My feedback history</span>
+        <span class="badge-ghost" id="feedbackCount">0</span>
+      </div>
+      <div class="card-body" id="feedbackList"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>Student.initFeedbackPage();</script>
+{% endblock %}

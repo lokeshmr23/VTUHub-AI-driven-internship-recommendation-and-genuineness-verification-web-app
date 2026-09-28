@@ -1,0 +1,119 @@
+{% extends 'partials/base_app.html' %}
+{% block title %}Student dashboard · {{ app_name }}{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_sub %}Your matches, applications and trust exposure at a glance{% endblock %}
+{% block topbar_actions %}
+  <a class="btn btn-soft btn-sm" href="/student/profile"><i class="bi bi-upload me-1"></i>Upload resume</a>
+  <a class="btn btn-gradient btn-sm" href="/student/recommendations"><i class="bi bi-stars me-1"></i>Recommendations</a>
+{% endblock %}
+{% block content %}
+<div id="dashboardRoot">
+
+  <div class="hero-card p-4 mb-4" id="heroCard">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-8">
+        <h2 class="h4 fw-800 mb-1" id="heroGreeting">Welcome back 👋</h2>
+        <p class="mb-0" style="opacity:.92" id="heroSub">Loading your placement snapshot…</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <div class="d-flex gap-2 justify-content-lg-end" id="heroActions"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4" id="kpiRow">
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div><div class="stat-label">Applications</div>
+            <div class="stat-value" data-kpi="applications">—</div>
+            <div class="text-muted-soft text-tiny" data-kpi-sub="applications"></div></div>
+          <div class="stat-icon"><i class="bi bi-send-check"></i></div>
+        </div></div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card accent-amber h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div><div class="stat-label">Shortlisted+</div>
+            <div class="stat-value" data-kpi="shortlisted">—</div>
+            <div class="text-muted-soft text-tiny">interview / selected</div></div>
+          <div class="stat-icon"><i class="bi bi-trophy"></i></div>
+        </div></div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card accent-green h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div><div class="stat-label">Avg. match</div>
+            <div class="stat-value" data-kpi="avg_match">—</div>
+            <div class="text-muted-soft text-tiny">across applications</div></div>
+          <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        </div></div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div><div class="stat-label">Resume ATS</div>
+            <div class="stat-value" data-kpi="ats_score">—</div>
+            <div class="text-muted-soft text-tiny" data-kpi-sub="skills"></div></div>
+          <div class="stat-icon"><i class="bi bi-file-earmark-check"></i></div>
+        </div></div></div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-diagram-3 me-2 text-primary"></i>Application funnel</span>
+          <span class="badge-ghost" id="funnelTotal">—</span>
+        </div>
+        <div class="card-body"><div class="chart-box" style="height:250px">
+          <canvas id="statusChart"></canvas></div></div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card h-100">
+        <div class="card-header"><i class="bi bi-shield-check me-2 text-primary"></i>Trust exposure</div>
+        <div class="card-body"><div class="chart-box" style="height:250px">
+          <canvas id="trustExposureChart"></canvas></div>
+          <div class="text-center text-muted-soft text-tiny mt-2">Listings you applied to, by badge</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-cloud me-2 text-primary"></i>Skill profile</span>
+          <a class="badge-soft" href="/student/profile">manage</a>
+        </div>
+        <div class="card-body" id="skillCloudBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold"><i class="bi bi-stars me-2 text-primary"></i>Top matches for you</h5>
+    <a class="btn btn-soft btn-sm" href="/student/recommendations">See all <i class="bi bi-arrow-right"></i></a>
+  </div>
+  <div class="row g-3 mb-4" id="topRecs"></div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-clock-history me-2 text-primary"></i>Recent applications</span>
+      <a class="btn btn-soft btn-sm" href="/student/applications">View all</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead><tr>
+          <th>Role</th><th>Company</th><th>Match</th><th>Trust</th><th>Status</th><th>Applied</th>
+        </tr></thead>
+        <tbody id="recentAppsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>Student.initDashboard();</script>
+{% endblock %}
