@@ -574,10 +574,22 @@ def seed_students(count: int = 50) -> list[StudentProfile]:
                 branch=branch,
                 grad_year=RNG.choice([2026, 2027, 2027, 2028]),
                 projects=RNG.sample(
-                    [f"{RNG.choice(['Smart', 'Real-time', 'AI-powered', 'Distributed', 'Automated'])} "
-                     f"{RNG.choice(['Attendance System', 'Chatbot', 'Recommendation Engine', 'Dashboard',
-                                    'Monitoring Platform', 'Trading Bot', 'Campus Portal', 'Vision Model'])}"
-                     for _ in range(3)], 2),
+    [
+        f"{RNG.choice(['Smart', 'Real-time', 'AI-powered', 'Distributed', 'Automated'])} "
+        + RNG.choice([
+            'Attendance System',
+            'Chatbot',
+            'Recommendation Engine',
+            'Dashboard',
+            'Monitoring Platform',
+            'Trading Bot',
+            'Campus Portal',
+            'Vision Model'
+        ])
+        for _ in range(3)
+    ],
+    2
+),
                 experience=RNG.choice([
                     f"Intern, {RNG.choice(GENUINE_COMPANIES)[0]} — Jun {2025} - Aug {2025}",
                     "", "",
